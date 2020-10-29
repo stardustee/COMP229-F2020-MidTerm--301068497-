@@ -14,10 +14,7 @@ router.get('/', (req, res, next) => {
       return console.error(err);
     }
     else {
-      res.render('books/index', {
-        title: 'Books',
-        books: books
-      });
+      res.render('books/index', { title: 'Books', books: books});
     }
   });
 
@@ -25,107 +22,72 @@ router.get('/', (req, res, next) => {
 
 //  GET the Book Details page in order to add a new Book
 router.get('/add', (req, res, next) => {
-  
-  //************************ADDED CODE***************************//
-  res.render('books/add', {title: 'Add Book'});
-  //************************ADDED CODE***************************//
-
-
+  res.render('books/details', { title: 'Add Book' })
 });
 
 // POST process the Book Details page and create a new Book - CREATE
 router.post('/add', (req, res, next) => {
-
-//************************ADDED CODE***************************//
-    let newBook = book ({
-      "Name": req.body.Name,
-      "Description": req.body.Description,
-      "Price": req.body.Price,
-      "Author": req.body.Author,
-      "Genre": req.body.Genre
-
+  let books = book({
+    "Title":req.body.title,
+    "Price":req.body.price,
+    "Author":req.body.author,
+    "Genre":req.body.genre
+  });
+  book.create(books,(err,book)=>{
+    if(err){
+      return console.error(err);
+    } else {
+      res.redirect('/books');
+    }
+  });
 });
-book.create(newBook, (err, books) =>{
-if (err)
-{
-console.log(err);
-res.end(err);
-}
-else
-{
-res.redirect('/books');
-}
-});
-
-});
-//************************ADDED CODE***************************//
 
 // GET the Book Details page in order to edit an existing Book
 router.get('/:id', (req, res, next) => {
+  let id = req.params.id;
 
-//************************ADDED CODE***************************//
-    let id = req.params.id
-
- book.findByID ( id, (err, bookToEdit) => {
-   if(err)
-   {
-     console.log(err);
-     res.end(err);
-   }
-   else
-   {
-    res.render('books/edit', {title: 'Edit Book', books: bookToEdit});
-   }
- });
+  book.findById(id,(err,BookToEdit)=>{
+    if(err){
+      return console.error(err);
+    } else {
+      res.render('books/details', { title: 'Edit Book', books: BookToEdit});
+    }
+  })
 });
-//************************ADDED CODE***************************//
 
 // POST - process the information passed from the details form and update the document
 router.post('/:id', (req, res, next) => {
+  let id = req.params.id;
 
-//************************ADDED CODE***************************//
-    let id = req.params.id
-    let updatedBook = book({
-      "_id": id,
-      "Name": req.body.Name,
-      "Description": req.body.Description,
-      "Price": req.body.Price,
-      "Author": req.body.Author,
-      "Genre": req.body.Genre
-    });
-    book.updateOne({_id: id },updatedBook, (err)=>{
-      if(err)
-     {
-       console.log(err);
-       res.end(err);
-     }
-     else
-     {
-      res.redirect ('/books');
-     }
-    });
+  let updatedBook = book({
+    "_id": id,
+    "Title":req.body.title,
+    "Price":req.body.price,
+    "Author":req.body.author,
+    "Genre":req.body.genre
+  });
 
+  book.updateOne({_id: id}, updatedBook, (err)=>{
+    if(err){
+      return console.error(err);
+    } else {
+      res.redirect('/books');
+    }
+  });
 });
-//************************ADDED CODE***************************//
 
 // GET - process the delete by user id
 router.get('/delete/:id', (req, res, next) => {
+  let id = req.params.id;
 
-  //************************ADDED CODE***************************//
-  let id = req.params.id
-  book.remove({_id: id }, (err)=>{
-    if(err)
-    {
-      console.log(err);
-      res.end(err);
-    }
-    else
-    {
-     res.redirect('/books');
-    }
+  book.remove({_id:id},(err)=>{
+      if(err){
+          return console.error(err);
+      } else {
+        res.redirect('/books');
+      }
   });
-
 });
-//************************ADDED CODE***************************//
+
 
 module.exports = router;
